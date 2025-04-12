@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Level Ubuntu App Builder: Code, Run, Deploy</title>
+    <style>
+        /* Dark Neon Theme */
+        :root {
+            --bg-color: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0b0;
+            --neon-blue: #00eeff;
+            --neon-green: #39ff14;
+            --neon-pink: #ff00ff;
+            --neon-yellow: #ffff00;
+            --font-main: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            --font-code: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 1rem;
+            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30,30,30,0.9) 100%);
+            border-bottom: 2px solid var(--neon-blue);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(57, 255, 20, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 80% 30%, rgba(0, 238, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 70%, rgba(255, 0, 255, 0.1) 0%, transparent 20%);
+            z-index: -1;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(0, 238, 255, 0.3);
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            margin: 2.5rem 0 1.5rem;
+            color: var(--neon-blue);
+            border-bottom: 1px solid var(--neon-blue);
+            padding-bottom: 0.5rem;
+            text-shadow: 0 0 5px rgba(0, 238, 255, 0.5);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            font-size: 1.1rem;
+        }
+
+        ul {
+            margin: 1rem 0 1.5rem 2rem;
+        }
+
+        li {
+            margin-bottom: 0.7rem;
+        }
+
+        code {
+            font-family: var(--font-code);
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            color: var(--neon-yellow);
+            border: 1px solid rgba(255, 255, 0, 0.3);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 238, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 238, 255, 0.2);
+            border-color: var(--neon-blue);
+        }
+
+        .feature-card h3 {
+            margin-top: 0;
+        }
+
+        .terminal-demo {
+            background-color: #000;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            font-family: var(--font-code);
+            color: #0f0;
+            border: 1px solid var(--neon-green);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+            position: relative;
+        }
+
+        .terminal-demo::before {
+            content: "ubuntu@next-level:~$";
+            color: var(--neon-pink);
+            margin-right: 10px;
+        }
+
+        .terminal-line {
+            display: block;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-decoration: none;
+            margin: 2rem 0;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 238, 255, 0.5);
+            text-align: center;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 0, 255, 0.7);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-top: 1px solid var(--neon-blue);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            h3 {
+                font-size: 1.3rem;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                width: 95%;
+                padding: 1rem 0.5rem;
+            }
+        }
+
+        /* Animation Effects */
+        @keyframes neonPulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        .neon-text {
+            animation: neonPulse 2s infinite;
+        }
+
+        .highlight-blue {
+            color: var(--neon-blue);
+            font-weight: bold;
+        }
+
+        .highlight-green {
+            color: var(--neon-green);
+            font-weight: bold;
+        }
+
+        .highlight-pink {
+            color: var(--neon-pink);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Next Level Ubuntu App Builder</h1>
+            <p class="neon-text" style="font-size: 1.4rem; color: var(--neon-pink);">Code, Run, Deploy — All in One Powerful Environment</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Section 1: Welcome to the Next Level -->
+        <section id="welcome">
+            <h2>Welcome to the Next Level</h2>
+            <p>
+                The <span class="highlight-blue">Next Level Ubuntu App Builder</span> represents a revolutionary evolution in web-based development environments. 
+                Gone are the days of juggling multiple tools and terminals — we've created a powerful, integrated IDE designed specifically for 
+                seamless backend development on Ubuntu.
+            </p>
+            <p>
+                This isn't just another code editor. It's a complete development ecosystem where coding, terminal operations, 
+                and deployment coexist in perfect harmony. Whether you're building microservices, APIs, or full-stack applications, 
+                the Next Level Ubuntu App Builder provides everything you need in one cohesive environment.
+            </p>
+            <p>
+                Designed by developers for developers, this platform combines the flexibility of Ubuntu with the convenience of a modern web IDE, 
+                creating an unparalleled development experience that will transform your workflow.
+            </p>
+        </section>
+
+        <!-- Section 2: Core Features -->
+        <section id="features">
+            <h2>Core Features (The Upgrade)</h2>
+            <p>
+                We've reimagined what a development environment should be, focusing on power, efficiency, and developer experience. 
+                Here's what makes the Next Level Ubuntu App Builder truly exceptional:
+            </p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Revamped Dark Neon UI</h3>
+                    <p>
+                        Our sleek, modern interface combines a dark foundation with vibrant neon accents, reducing eye strain during long coding sessions 
+                        while maintaining perfect readability. The carefully crafted color scheme highlights important code elements and UI components, 
+                        making navigation intuitive and development more enjoyable.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Supercharged Code Editor</h3>
+                    <p>
+                        Experience coding at its finest with our advanced editor featuring:
+                    </p>
+                    <ul>
+                        <li>Intelligent syntax highlighting for over 100 languages</li>
+                        <li>Predictive IntelliSense and context-aware auto-completion</li>
+                        <li>Real-time error linting and code quality suggestions</li>
+                        <li>Customizable keyboard shortcuts and themes</li>
+                        <li>Split-view editing for side-by-side code comparison</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Fully Integrated Ubuntu Terminal</h3>
+                    <p>
+                        The heart of our platform is a genuine Ubuntu terminal environment embedded directly in your browser. 
+                        Run <em>actual</em> Ubuntu commands with full system capabilities:
+                    </p>
+                    <ul>
+                        <li>Package management with <code>apt</code> and <code>dpkg</code></li>
+                        <li>Python environment control via <code>pip</code>, <code>venv</code>, and <code>conda</code></li>
+                        <li>Version control with <code>git</code> commands</li>
+                        <li>Server management using <code>systemd</code>, <code>nginx</code>, etc.</li>
+                        <li>Powerful shell scripting with <code>bash</code> or <code>zsh</code></li>
+                        <li>Remote server access through <code>ssh</code> and <code>scp</code></li>
+                    </ul>
+                    <p>
+                        This isn't a simulation — it's a complete Ubuntu terminal at your fingertips, serving as the central hub for all your 
+                        environment management and execution needs.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Seamless Git Integration</h3>
+                    <p>
+                        Manage your code repositories without leaving your development environment:
+                    </p>
+                    <ul>
+                        <li>Visual diff viewer for tracking changes</li>
+                        <li>One-click commits, pushes, and pulls</li>
+                        <li>Branch management and merge conflict resolution</li>
+                        <li>GitHub, GitLab, and Bitbucket integration</li>
+                        <li>Commit history visualization</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Enhanced Run/Debug/Preview</h3>
+                    <p>
+                        Take control of your application execution with:
+                    </p>
+                    <ul>
+                        <li>Configurable run commands for any framework or language</li>
+                        <li>Dedicated output and error panels with syntax highlighting</li>
+                        <li>Interactive debugger with breakpoints and variable inspection</li>
+                        <li>Live previews for web applications with hot reloading</li>
+                        <li>Performance profiling and monitoring tools</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Robust Templates</h3>
+                    <p>
+                        Jump-start your projects with our comprehensive template library:
+                    </p>
+                    <ul>
+                        <li>Flask, Django, and FastAPI for Python backends</li>
+                        <li>Express.js, NestJS, and Next.js for JavaScript/TypeScript</li>
+                        <li>Spring Boot for Java applications</li>
+                        <li>Laravel and Symfony for PHP development</li>
+                        <li>Custom template creation and sharing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="terminal-demo">
+                <span class="terminal-line">apt update && apt install -y python3-pip nodejs</span>
+                <span class="terminal-line">pip install flask gunicorn</span>
+                <span class="terminal-line">git clone https://github.com/user/awesome-project.git</span>
+                <span class="terminal-line">cd awesome-project</span>
+                <span class="terminal-line">python3 app.py</span>
+                <span class="terminal-line" style="color: var(--neon-blue);">* Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)</span>
+            </div>
+        </section>
+
+        <!-- Section 3: Why Develop Here? -->
+        <section id="benefits">
+            <h2>Why Develop Here? (The Benefits)</h2>
+            <p>
+                The Next Level Ubuntu App Builder isn't just another development tool — it's a complete paradigm shift in how backend 
+                development can be approached. Here's why it's the ultimate choice for modern developers:
+            </p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>Ultimate Control</h3>
+                    <p>
+                        With our integrated terminal, you have complete command over your development environment. 
+                        Install packages, configure services, and manage processes with the full power of Ubuntu at your disposal. 
+                        No restrictions, no compromises — just pure control.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Streamlined Workflow</h3>
+                    <p>
+                        Code, test, manage dependencies, and deploy all from a single tab in your browser. 
+                        No more context switching between multiple applications, terminals, and windows. 
+                        Your entire development lifecycle exists in one cohesive environment, dramatically increasing productivity.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Powerful Automation</h3>
+                    <p>
+                        Leverage the full capabilities of shell scripting to automate repetitive tasks. 
+                        Create custom commands, build deployment pipelines, and streamline your workflow with the 
+                        same tools you'd use on a production server.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Resource Efficiency</h3>
+                    <p>
+                        Say goodbye to the resource drain of running multiple desktop applications. 
+                        Our cloud-based approach means your development environment runs in a browser tab, 
+                        freeing up system resources for testing and other tasks.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Environment Consistency</h3>
+                    <p>
+                        Develop in an environment that mirrors your production servers. 
+                        With a real Ubuntu backend, you can be confident that what works in development 
+                        will work in production, eliminating the "it works on my machine" problem.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Remote Server Management</h3>
+                    <p>
+                        Connect to your production or staging servers directly from the integrated terminal using SSH. 
+                        Deploy changes, monitor performance, and troubleshoot issues without leaving your development environment.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Get Started -->
+        <section id="get-started">
+            <h2>Get Started</h2>
+            <p>
+                The Next Level Ubuntu App Builder represents the future of backend development — a future where 
+                powerful tools, seamless integration, and developer-focused design come together to create an 
+                unparalleled coding experience.
+            </p>
+            <p>
+                Whether you're building microservices, APIs, web applications, or system tools, our platform provides 
+                the perfect environment to bring your ideas to life. With the full power of Ubuntu at your fingertips 
+                and a modern, intuitive interface guiding your workflow, you'll wonder how you ever developed any other way.
+            </p>
+            <p>
+                Join the revolution in web-based development and experience the perfect fusion of power and convenience. 
+                Your code deserves nothing less.
+            </p>
+            
+            <a href="#" class="cta-button">Sign Up for Beta Access</a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Next Level Ubuntu App Builder. All rights reserved.</p>
+            <p class="neon-text" style="color: var(--neon-green);">The future of backend development is here.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple script to add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effect to terminal demo
+            const terminal = document.querySelector('.terminal-demo');
+            terminal.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 0 25px rgba(57, 255, 20, 0.5)';
+            });
+            terminal.addEventListener('mouseleave', function() {
+                this.style.boxShadow = '0 0 15px rgba(57, 255, 20, 0.3)';
+            });
+            
+            // Smooth scrolling for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
