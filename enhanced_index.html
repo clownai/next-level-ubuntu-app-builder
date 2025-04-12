@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next Level Ubuntu App Builder - Advanced Visual Playground</title>
+    <style>
+        /* Dark Neon Theme */
+        :root {
+            --bg-color: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-tertiary: #252525;
+            --bg-active: #2d2d2d;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0b0;
+            --neon-blue: #00eeff;
+            --neon-green: #39ff14;
+            --neon-pink: #ff00ff;
+            --neon-yellow: #ffff00;
+            --neon-orange: #ff9900;
+            --neon-red: #ff3333;
+            --neon-purple: #9966ff;
+            --border-color: #333333;
+            --font-main: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            --font-code: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .top-bar {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 3rem;
+        }
+
+        .app-title {
+            color: var(--neon-blue);
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 238, 255, 0.5);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .action-button {
+            background-color: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--neon-green);
+            border-radius: 4px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 5px rgba(57, 255, 20, 0.3);
+            position: relative;
+        }
+
+        .action-button:hover {
+            background-color: rgba(57, 255, 20, 0.1);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        .action-button.run {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .action-button.debug {
+            border-color: var(--neon-orange);
+            color: var(--neon-orange);
+            box-shadow: 0 0 5px rgba(255, 153, 0, 0.3);
+        }
+
+        .action-button.debug:hover {
+            background-color: rgba(255, 153, 0, 0.1);
+            box-shadow: 0 0 10px rgba(255, 153, 0, 0.5);
+        }
+
+        .action-button.save {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            box-shadow: 0 0 5px rgba(0, 238, 255, 0.3);
+        }
+
+        .action-button.save:hover {
+            background-color: rgba(0, 238, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 238, 255, 0.5);
+        }
+
+        .action-button.git {
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+            box-shadow: 0 0 5px rgba(255, 0, 255, 0.3);
+        }
+
+        .action-button.git:hover {
+            background-color: rgba(255, 0, 255, 0.1);
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+        }
+
+        .action-button.deploy {
+            border-color: var(--neon-yellow);
+            color: var(--neon-yellow);
+            box-shadow: 0 0 5px rgba(255, 255, 0, 0.3);
+        }
+
+        .action-button.deploy:hover {
+            background-color: rgba(255, 255, 0, 0.1);
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+        }
+
+        .action-button.share {
+            border-color: var(--neon-purple);
+            color: var(--neon-purple);
+            box-shadow: 0 0 5px rgba(153, 102, 255, 0.3);
+        }
+
+        .action-button.share:hover {
+            background-color: rgba(153, 102, 255, 0.1);
+            box-shadow: 0 0 10px rgba(153, 102, 255, 0.5);
+        }
+
+        .save-notification {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--bg-active);
+            color: var(--neon-green);
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+            border: 1px solid var(--neon-green);
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .save-notification.show {
+            opacity: 1;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Collaborator Avatars */
+        .collaborators {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: 1rem;
+        }
+
+        .collaborator-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .collaborator-avatar:nth-child(1) {
+            background-color: var(--neon-blue);
+            color: var(--bg-color);
+        }
+
+        .collaborator-avatar:nth-child(2) {
+            background-color: var(--neon-green);
+            color: var(--bg-color);
+        }
+
+        .collaborator-avatar:nth-child(3) {
+            background-color: var(--neon-pink);
+            color: var(--bg-color);
+        }
+
+        /* File Explorer Panel - ENHANCED */
+        .file-explorer {
+            width: 250px;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 1rem 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-title {
+            padding: 0 1rem 0.5rem;
+            font-weight: bold;
+            color: var(--neon-blue);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .file-tree {
+            padding: 0 0.5rem;
+            flex: 1;
+        }
+
+        .file-item, .folder-item {
+            padding: 0.3rem 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .file-item:hover, .folder-item:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        /* ENHANCED: More distinct active file highlight */
+        .file-item.active {
+            background-color: rgba(0, 238, 255, 0.25);
+            border-left: 3px solid var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 238, 255, 0.5);
+            font-weight: bold;
+        }
+
+        .file-icon, .folder-icon {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .folder-icon {
+            color: var(--neon-yellow);
+        }
+
+        .file-icon.python {
+            color: var(--neon-blue);
+        }
+
+        .file-icon.text {
+            color: var(--text-secondary);
+        }
+
+        .file-icon.git {
+            color: var(--neon-pink);
+        }
+
+        /* ENHANCED: More distinct file status colors */
+        .file-item.modified {
+            color: var(--neon-yellow);
+            text-shadow: 0 0 5px rgba(255, 255, 0, 0.3);
+        }
+
+        .file-item.new {
+            color: var(--neon-green);
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.3);
+        }
+
+        .indent {
+            margin-left: 1.2rem;
+        }
+
+        /* ENHANCED: More prominent folder toggle */
+        .folder-toggle {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+            color: var(--neon-yellow);
+            transition: transform 0.2s ease;
+            text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+            font-size: 1.1rem;
+            text-align: center;
+            line-height: 16px;
+        }
+
+        .folder-toggle.open {
+            transform: rotate(90deg);
+        }
+
+        .folder-item:hover .folder-toggle {
+            color: var(--neon-orange);
+            text-shadow: 0 0 8px rgba(255, 153, 0, 0.7);
+        }
+
+        .file-actions {
+            position: absolute;
+            right: 8px;
+            display: none;
+            gap: 8px;
+        }
+
+        .file-item:hover .file-actions,
+        .folder-item:hover .file-actions {
+            display: flex;
+        }
+
+        .file-action-icon {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .file-action-icon:hover {
+            color: var(--neon-blue);
+        }
+
+        /* Commit History Panel */
+        .commit-history {
+            border-top: 1px solid var(--border-color);
+            padding: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .commit-history-title {
+            font-weight: bold;
+            color: var(--neon-pink);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .commit-item {
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            background-color: var(--bg-tertiary);
+            font-size: 0.9rem;
+        }
+
+        .commit-message {
+            font-weight: bold;
+            margin-bottom: 0.2rem;
+        }
+
+        .commit-details {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Code Editor Panel */
+        .code-editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-color);
+            position: relative;
+        }
+
+        .editor-tabs {
+            display: flex;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .editor-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .editor-tab.active {
+            background-color: var(--bg-active);
+            border-bottom: 2px solid var(--neon-blue);
+        }
+
+        .unsaved-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--neon-orange);
+            margin-left: 5px;
+            box-shadow: 0 0 5px rgba(255, 153, 0, 0.5);
+        }
+
+        .editor-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .editor-search-bar {
+            position: absolute;
+            top: 10px;
+            right: 50px;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 5;
+        }
+
+        .editor-search-icon, .editor-replace-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .editor-search-icon:hover, .editor-replace-icon:hover {
+            background-color: var(--bg-active);
+            color: var(--neon-blue);
+            box-shadow: 0 0 5px rgba(0, 238, 255, 0.3);
+        }
+
+        .line-numbers {
+            padding: 1rem 0.5rem;
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            text-align: right;
+            user-select: none;
+            font-family: var(--font-code);
+            font-size: 0.9rem;
+            border-right: 1px solid var(--border-color);
+            min-width: 2.5rem;
+            position: relative;
+        }
+
+        .breakpoint {
+            position: absolute;
+            left: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--neon-red);
+            box-shadow: 0 0 5px rgba(255, 51, 51, 0.5);
+        }
+
+        .breakpoint.line-7 {
+            top: 155px;
+        }
+
+        .breakpoint.line-12 {
+            top: 275px;
+        }
+
+        .code-area {
+            flex: 1;
+            padding: 1rem;
+            font-family: var(--font-code);
+            font-size: 0.9rem;
+            white-space: pre;
+            overflow: auto;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .ai-suggestion {
+            position: absolute;
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            color: var(--neon-purple);
+            cursor: pointer;
+        }
+
+        .ai-suggestion.line-8 {
+            left: 5px;
+            top: 175px;
+        }
+
+        .ai-suggestion.line-13 {
+            left: 5px;
+            top: 295px;
+        }
+
+        /* Code Minimap - ENHANCED */
+        .code-minimap {
+            width: 80px;
+            background-color: var(--bg-tertiary);
+            border-left: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: relative;
+        }
+
+        .minimap-content {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+        }
+
+        /* ENHANCED: More distinct minimap lines */
+        .minimap-line {
+            height: 3px;
+            margin-bottom: 2px;
+            background-color: var(--text-secondary);
+            opacity: 0.5;
+            border-radius: 1px;
+        }
+
+        .minimap-line.keyword {
+            background-color: var(--neon-pink);
+            opacity: 0.8;
+            box-shadow: 0 0 3px rgba(255, 0, 255, 0.5);
+        }
+
+        .minimap-line.string {
+            background-color: var(--neon-green);
+            opacity: 0.8;
+            box-shadow: 0 0 3px rgba(57, 255, 20, 0.5);
+        }
+
+        .minimap-line.comment {
+            background-color: var(--text-secondary);
+            opacity: 0.4;
+        }
+
+        .minimap-line.function {
+            background-color: var(--neon-yellow);
+            opacity: 0.8;
+            box-shadow: 0 0 3px rgba(255, 255, 0, 0.5);
+        }
+
+        .minimap-viewport {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            border: 1px solid var(--neon-blue);
+            background-color: rgba(0, 238, 255, 0.05);
+            box-shadow: 0 0 5px rgba(0, 238, 255, 0.3);
+        }
+
+        /* Syntax Highlighting */
+        .keyword {
+            color: var(--neon-pink);
+        }
+
+        .function {
+            color: var(--neon-yellow);
+        }
+
+        .string {
+            color: var(--neon-green);
+        }
+
+        .comment {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .highlight {
+            background-color: rgba(57, 255, 20, 0.1);
+            border-radius: 2px;
+        }
+
+        /* Terminal/Output Panel */
+        .terminal-panel {
+            height: 30%;
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-tabs {
+            display: flex;
+            background-color: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .terminal-tab {
+            padding: 0.3rem 1rem;
+            cursor: pointer;
+            border-right: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .terminal-tab.active {
+            background-color: var(--bg-active);
+            border-top: 2px solid var(--neon-green);
+        }
+
+        /* ENHANCED: More distinct Live Preview tab */
+        .terminal-tab.live-preview {
+            color: var(--neon-green);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .terminal-tab.live-preview.active {
+            background-color: var(--bg-active);
+            border-top: 2px solid var(--neon-green);
+            box-shadow: inset 0 0 10px rgba(57, 255, 20, 0.2);
+        }
+
+        .terminal-instances {
+            display: flex;
+            background-color: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.2rem 0.5rem;
+        }
+
+        .terminal-instance {
+            padding: 0.2rem 0.5rem;
+            margin-right: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            background-color: var(--bg-secondary);
+        }
+
+        .terminal-instance.active {
+            background-color: var(--bg-active);
+            color: var(--neon-green);
+        }
+
+        .terminal-instance-add {
+            padding: 0.2rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .terminal-content {
+            flex: 1;
+            padding: 0.5rem;
+            font-family: var(--font-code);
+            font-size: 0.9rem;
+            overflow: auto;
+            background-color: #0a0a0a;
+        }
+
+        .terminal-prompt {
+            color: var(--neon-green);
+        }
+
+        .terminal-output {
+            color: var(--text-primary);
+        }
+
+        .terminal-cursor {
+            display: inline-block;
+            width: 0.6rem;
+            height: 1rem;
+            background-color: var(--neon-green);
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+
+        .error-line {
+            color: var(--neon-red);
+        }
+
+        .warning-line {
+            color: var(--neon-orange);
+        }
+
+        /* Live Preview Panel - ENHANCED */
+        .preview-panel {
+            width: 30%;
+            background-color: var(--bg-secondary);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            padding: 0.5rem;
+            background-color: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ENHANCED: More prominent Live Preview title */
+        .preview-title {
+            font-weight: bold;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ENHANCED: More prominent refresh button */
+        .refresh-button {
+            background-color: rgba(0, 238, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 5px rgba(0, 238, 255, 0.3);
+            font-size: 1.1rem;
+        }
+
+        .refresh-button:hover {
+            background-color: rgba(0, 238, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 238, 255, 0.5);
+        }
+
+        .preview-content {
+            flex: 1;
+            padding: 1rem;
+            overflow: auto;
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .preview-content h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-main);
+        }
+
+        /* AI Assistant Panel */
+        .ai-assistant {
+            border-top: 1px solid var(--border-color);
+            padding: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .ai-assistant-title {
+            font-weight: bold;
+            color: var(--neon-purple);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-message {
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            background-color: var(--bg-tertiary);
+            font-size: 0.9rem;
+        }
+
+        /* Status Bar - ENHANCED */
+        .status-bar {
+            height: 28px;
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ENHANCED: More distinct status items */
+        .status-item {
+            margin-right: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 3px;
+        }
+
+        .status-item.branch {
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px rgba(255, 0, 255, 0.3);
+            background-color: rgba(255, 0, 255, 0.05);
+        }
+
+        .status-item.python {
+            color: var(--neon-blue);
+            text-shadow: 0 0 5px rgba(0, 238, 255, 0.3);
+            background-color: rgba(0, 238, 255, 0.05);
+        }
+
+        .status-item.position {
+            color: var(--neon-yellow);
+            text-shadow: 0 0 5px rgba(255, 255, 0, 0.3);
+            background-color: rgba(255, 255, 0, 0.05);
+        }
+
+        .status-item.encoding {
+            color: var(--text-secondary);
+            background-color: rgba(176, 176, 176, 0.05);
+        }
+
+        .status-item.saved {
+            color: var(--neon-green);
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.3);
+            background-color: rgba(57, 255, 20, 0.05);
+        }
+
+        .status-spacer {
+            flex: 1;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .rotating {
+            animation: rotate 1s linear;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .preview-panel {
+                width: 40%;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .file-explorer {
+                width: 200px;
+            }
+            
+            .preview-panel {
+                width: 300px;
+            }
+            
+            .code-minimap {
+                width: 60px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .file-explorer {
+                width: 100%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .preview-panel {
+                width: 100%;
+                height: 300px;
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+            }
+            
+            .terminal-panel {
+                height: 40%;
+            }
+            
+            .code-minimap {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Action Bar -->
+        <div class="top-bar">
+            <div class="app-title">Next Level Ubuntu App Builder</div>
+            <div class="action-buttons">
+                <button class="action-button run">Run</button>
+                <button class="action-button debug">Debug</button>
+                <button class="action-button save">
+                    Save
+                    <div class="save-notification">File Saved!</div>
+                </button>
+                <button class="action-button git">Git</button>
+                <button class="action-button deploy">Deploy</button>
+                <button class="action-button share">Share</button>
+                <div class="collaborators">
+                    <div class="collaborator-avatar">JD</div>
+                    <div class="collaborator-avatar">KL</div>
+                    <div class="collaborator-avatar">MN</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <!-- Left Panel: File Explorer -->
+            <div class="file-explorer">
+                <div class="project-title">Project: MyBackendApp</div>
+                <div class="file-tree">
+                    <div class="folder-item">
+                        <span class="folder-toggle open">▶</span>
+                        <span class="folder-icon">📁</span>
+                        <span>src/</span>
+                        <div class="file-actions">
+                            <span class="file-action-icon">✏️</span>
+                            <span class="file-action-icon">🗑️</span>
+                        </div>
+                    </div>
+                    <div class="file-item active indent">
+                        <span class="file-icon python">🐍</span>
+                        <span>main.py</span>
+                        <div class="file-actions">
+                            <span class="file-action-icon">✏️</span>
+                            <span class="file-action-icon">🗑️</span>
+                        </div>
+                    </div>
+                    <div class="file-item modified indent">
+                        <span class="file-icon python">🐍</span>
+                        <span>app.py</span>
+                        <div class="file-actions">
+                            <span class="file-action-icon">✏️</span>
+                            <span class="file-action-icon">🗑️</span>
+                        </div>
+                    </div>
+                    <div class="folder-item">
+                        <span class="folder-toggle">▶</span>
+                        <span class="folder-icon">📁</span>
+                        <span>tests/</span>
+                        <div class="file-actions">
+                            <span class="file-action-icon">✏️</span>
+                            <span class="file-action-icon">🗑️</span>
+                        </div>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon text">📄</span>
+                        <span>requirements.txt</span>
+                        <div class="file-actions">
+                            <span class="file-action-icon">✏️</span>
+                            <span class="file-action-icon">🗑️</span>
+                        </div>
+                    </div>
+                    <div class="file-item new">
+                        <span class="file-icon git">📝</span>
+                        <span>.gitignore</span>
+                        <div class="file-actions">
+                            <span class="file-action-icon">✏️</span>
+                            <span class="file-action-icon">🗑️</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Commit History Section -->
+                <div class="commit-history">
+                    <div class="commit-history-title">
+                        <span class="file-icon git">📝</span>
+                        <span>Commit History</span>
+                    </div>
+                    <div class="commit-item">
+                        <div class="commit-message">Add Flask server implementation</div>
+                        <div class="commit-details">
+                            <span>John Doe</span>
+                            <span>2 hours ago</span>
+                        </div>
+                    </div>
+                    <div class="commit-item">
+                        <div class="commit-message">Initial project setup</div>
+                        <div class="commit-details">
+                            <span>John Doe</span>
+                            <span>Yesterday</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Center Panel: Code Editor -->
+            <div class="code-editor">
+                <div class="editor-tabs">
+                    <div class="editor-tab active">
+                        <span class="file-icon python">🐍</span>
+                        <span>main.py</span>
+                        <span class="unsaved-indicator"></span>
+                    </div>
+                    <div class="editor-tab">
+                        <span class="file-icon python">🐍</span>
+                        <span>app.py</span>
+                    </div>
+                </div>
+                <div class="editor-content">
+                    <div class="editor-search-bar">
+                        <div class="editor-search-icon">🔍</div>
+                        <div class="editor-replace-icon">⇄</div>
+                    </div>
+                    <div class="line-numbers">
+                        1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14
+                        <div class="breakpoint line-7"></div>
+                        <div class="breakpoint line-12"></div>
+                    </div>
+                    <div class="code-area">
+<span class="comment"># main.py - My Awesome App</span>
+<span class="keyword">import</span> flask
+
+app = flask.Flask(__name__)
+
+<span class="keyword">@app.route</span>(<span class="string">'/'</span>)
+<span class="keyword">def</span> <span class="function">hello_world</span>():
+    <span class="comment"># TODO: Add real logic</span><span class="ai-suggestion line-8">✨</span>
+    <span class="keyword">return</span> <span class="string">'&lt;h1&gt;Hello from Ubuntu App Builder!&lt;/h1&gt;'</span>
+
+<span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:
+    <span class="function">print</span>(<span class="string">"Starting server..."</span>)
+    <span class="highlight">app.run(debug=<span class="keyword">True</span>)</span> <span class="comment"># Run with debug mode</span><span class="ai-suggestion line-13">✨</span>
+                    </div>
+                    <div class="code-minimap">
+                        <div class="minimap-content">
+                            <div class="minimap-line comment"></div>
+                            <div class="minimap-line keyword"></div>
+                            <div class="minimap-line"></div>
+                            <div class="minimap-line"></div>
+                            <div class="minimap-line"></div>
+                            <div class="minimap-line keyword"></div>
+                            <div class="minimap-line keyword"></div>
+                            <div class="minimap-line comment"></div>
+                            <div class="minimap-line keyword"></div>
+                            <div class="minimap-line"></div>
+                            <div class="minimap-line keyword"></div>
+                            <div class="minimap-line function"></div>
+                            <div class="minimap-line keyword"></div>
+                            <div class="minimap-line comment"></div>
+                            <div class="minimap-viewport"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel: Live Preview -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <div class="preview-title">
+                        <span>🖥️</span>
+                        <span>Live Preview</span>
+                    </div>
+                    <button class="refresh-button">↻</button>
+                </div>
+                <div class="preview-content">
+                    <h1>Hello from Ubuntu App Builder!</h1>
+                </div>
+                
+                <!-- AI Assistant Section -->
+                <div class="ai-assistant">
+                    <div class="ai-assistant-title">
+                        <span>✨</span>
+                        <span>Manus Assist</span>
+                    </div>
+                    <div class="ai-message">
+                        I can help optimize your Flask application. Would you like suggestions for improving performance or adding features?
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Panel: Terminal/Output -->
+        <div class="terminal-panel">
+            <div class="terminal-tabs">
+                <div class="terminal-tab active">Terminal</div>
+                <div class="terminal-tab">Output</div>
+                <div class="terminal-tab">Problems (2)</div>
+                <div class="terminal-tab">Debug Console</div>
+                <div class="terminal-tab">Call Stack</div>
+                <div class="terminal-tab">Variables</div>
+                <div class="terminal-tab live-preview">
+                    <span>🖥️</span>
+                    <span>Live Preview</span>
+                </div>
+            </div>
+            <div class="terminal-instances">
+                <div class="terminal-instance active">Terminal 1</div>
+                <div class="terminal-instance">Terminal 2</div>
+                <div class="terminal-instance-add">+</div>
+            </div>
+            <div class="terminal-content">
+                <div class="terminal-line">
+                    <span class="terminal-prompt">user@nextlevel-builder:~/Project/MyBackendApp$</span>
+                    <span class="terminal-output"> ls -l</span>
+                </div>
+                <div class="terminal-line terminal-output">total 12</div>
+                <div class="terminal-line terminal-output">drwxr-xr-x 2 user user 4096 Apr 11 10:30 src</div>
+                <div class="terminal-line terminal-output">drwxr-xr-x 2 user user 4096 Apr 11 10:30 tests</div>
+                <div class="terminal-line terminal-output">-rw-r--r-- 1 user user  150 Apr 11 10:31 main.py</div>
+                <div class="terminal-line terminal-output">-rw-r--r-- 1 user user   50 Apr 11 10:32 requirements.txt</div>
+                <div class="terminal-line">
+                    <span class="terminal-prompt">user@nextlevel-builder:~/Project/MyBackendApp$</span>
+                    <span class="terminal-cursor"></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item branch">Branch: main</div>
+            <div class="status-item python">Python 3.10.12</div>
+            <div class="status-item position">Ln 12, Col 14</div>
+            <div class="status-spacer"></div>
+            <div class="status-item encoding">UTF-8</div>
+            <div class="status-item saved">Saved</div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced JavaScript for interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Editor tabs
+            const editorTabs = document.querySelectorAll('.editor-tab');
+            editorTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    editorTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Terminal tabs
+            const terminalTabs = document.querySelectorAll('.terminal-tab');
+            terminalTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    terminalTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Simple content switching (just for demonstration)
+                    const terminalContent = document.querySelector('.terminal-content');
+                    if (this.textContent.includes('Terminal')) {
+                        terminalContent.innerHTML = `
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">user@nextlevel-builder:~/Project/MyBackendApp$</span>
+                                <span class="terminal-output"> ls -l</span>
+                            </div>
+                            <div class="terminal-line terminal-output">total 12</div>
+                            <div class="terminal-line terminal-output">drwxr-xr-x 2 user user 4096 Apr 11 10:30 src</div>
+                            <div class="terminal-line terminal-output">drwxr-xr-x 2 user user 4096 Apr 11 10:30 tests</div>
+                            <div class="terminal-line terminal-output">-rw-r--r-- 1 user user  150 Apr 11 10:31 main.py</div>
+                            <div class="terminal-line terminal-output">-rw-r--r-- 1 user user   50 Apr 11 10:32 requirements.txt</div>
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">user@nextlevel-builder:~/Project/MyBackendApp$</span>
+                                <span class="terminal-cursor"></span>
+                            </div>
+                        `;
+                    } else if (this.textContent === 'Output') {
+                        terminalContent.innerHTML = `
+                            <div class="terminal-line terminal-output">No output yet</div>
+                        `;
+                    } else if (this.textContent.includes('Problems')) {
+                        terminalContent.innerHTML = `
+                            <div class="terminal-line error-line">Error: app.py:24 - Missing required parameter in function call</div>
+                            <div class="terminal-line warning-line">Warning: main.py:8 - TODO comment should be resolved before deployment</div>
+                        `;
+                    } else if (this.textContent.includes('Debug Console')) {
+                        terminalContent.innerHTML = `
+                            <div class="terminal-line terminal-output">Debug session started.</div>
+                            <div class="terminal-line terminal-output">Breakpoint hit at main.py:7</div>
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">debug></span>
+                                <span class="terminal-cursor"></span>
+                            </div>
+                        `;
+                    } else if (this.textContent.includes('Call Stack')) {
+                        terminalContent.innerHTML = `
+                            <div class="terminal-line terminal-output">Call Stack:</div>
+                            <div class="terminal-line terminal-output">1. hello_world() - main.py:7</div>
+                            <div class="terminal-line terminal-output">2. app.run() - main.py:13</div>
+                            <div class="terminal-line terminal-output">3. __main__ - main.py:11</div>
+                        `;
+                    } else if (this.textContent.includes('Variables')) {
+                        terminalContent.innerHTML = `
+                            <div class="terminal-line terminal-output">Local Variables:</div>
+                            <div class="terminal-line terminal-output">app = <Flask 'main'></div>
+                            <div class="terminal-line terminal-output">__name__ = '__main__'</div>
+                            <div class="terminal-line terminal-output">debug = True</div>
+                        `;
+                    } else if (this.textContent.includes('Live Preview')) {
+                        terminalContent.innerHTML = `
+                            <div class="terminal-line terminal-output" style="color: var(--neon-green);">Server running at http://localhost:5000/</div>
+                            <div class="terminal-line terminal-output">Rendering: &lt;h1&gt;Hello from Ubuntu App Builder!&lt;/h1&gt;</div>
+                        `;
+                    }
+                });
+            });
+            
+            // Terminal instances
+            const terminalInstances = document.querySelectorAll('.terminal-instance');
+            terminalInstances.forEach(instance => {
+                instance.addEventListener('click', function() {
+                    terminalInstances.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // File items
+            const fileItems = document.querySelectorAll('.file-item');
+            fileItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    fileItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // If main.py is clicked, make sure its tab is active
+                    if (this.textContent.trim().includes('main.py')) {
+                        editorTabs[0].classList.add('active');
+                        editorTabs[1].classList.remove('active');
+                    }
+                    // If app.py is clicked, make its tab active
+                    else if (this.textContent.trim().includes('app.py')) {
+                        editorTabs[1].classList.add('active');
+                        editorTabs[0].classList.remove('active');
+                    }
+                });
+            });
+            
+            // Folder toggle
+            const folderToggles = document.querySelectorAll('.folder-toggle');
+            folderToggles.forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    this.classList.toggle('open');
+                    
+                    // Toggle visibility of files in this folder
+                    const folderItem = this.parentElement;
+                    const nextItems = [];
+                    let nextSibling = folderItem.nextElementSibling;
+                    
+                    // Collect all indented items following this folder
+                    while (nextSibling && nextSibling.classList.contains('indent')) {
+                        nextItems.push(nextSibling);
+                        nextSibling = nextSibling.nextElementSibling;
+                    }
+                    
+                    // Toggle their visibility
+                    nextItems.forEach(item => {
+                        item.style.display = this.classList.contains('open') ? 'flex' : 'none';
+                    });
+                });
+            });
+            
+            // Save button functionality
+            const saveButton = document.querySelector('.action-button.save');
+            saveButton.addEventListener('click', function() {
+                // Remove unsaved indicator
+                const activeTab = document.querySelector('.editor-tab.active');
+                const unsavedIndicator = activeTab.querySelector('.unsaved-indicator');
+                if (unsavedIndicator) {
+                    unsavedIndicator.style.display = 'none';
+                }
+                
+                // Show save notification
+                const notification = this.querySelector('.save-notification');
+                notification.classList.add('show');
+                
+                // Update status bar
+                const savedStatus = document.querySelector('.status-item.saved');
+                savedStatus.textContent = 'Saved';
+                savedStatus.style.color = 'var(--neon-green)';
+                
+                // Hide notification after 2 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
+            });
+            
+            // Refresh button functionality
+            const refreshButton = document.querySelector('.refresh-button');
+            refreshButton.addEventListener('click', function() {
+                this.classList.add('rotating');
+                
+                // Remove rotation class after animation completes
+                setTimeout(() => {
+                    this.classList.remove('rotating');
+                }, 1000);
+            });
+            
+            // Action buttons hover effect
+            const actionButtons = document.querySelectorAll('.action-button');
+            actionButtons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05)';
+                });
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+            
+            // Blinking cursor animation
+            setInterval(() => {
+                const cursor = document.querySelector('.terminal-cursor');
+                if (cursor) {
+                    cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+                }
+            }, 500);
+            
+            // File action icons
+            const fileActionIcons = document.querySelectorAll('.file-action-icon');
+            fileActionIcons.forEach(icon => {
+                icon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // Just for visual effect, no actual functionality
+                });
+            });
+            
+            // AI suggestion icons
+            const aiSuggestions = document.querySelectorAll('.ai-suggestion');
+            aiSuggestions.forEach(icon => {
+                icon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // Just for visual effect, no actual functionality
+                });
+            });
+            
+            // Search and replace icons
+            const searchIcon = document.querySelector('.editor-search-icon');
+            const replaceIcon = document.querySelector('.editor-replace-icon');
+            
+            searchIcon.addEventListener('click', function() {
+                // Just for visual effect, no actual functionality
+            });
+            
+            replaceIcon.addEventListener('click', function() {
+                // Just for visual effect, no actual functionality
+            });
+        });
+    </script>
+</body>
+</html>
